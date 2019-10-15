@@ -51,6 +51,10 @@ services:
       MY_ID: out-1
       DB_MONGO_HOST: mongo
       ACTIVEMQ_BROKER_URL: tcp://activemq:61616
+    depends_on:
+      - activemq
+      - mongo
+      - mongo-express
     networks:
       - activemq
 
@@ -64,6 +68,10 @@ services:
       MY_ID: out-2
       DB_MONGO_HOST: mongo
       ACTIVEMQ_BROKER_URL: tcp://activemq:61616
+    depends_on:
+      - activemq
+      - mongo
+      - mongo-express
     networks:
       - activemq
 
@@ -77,6 +85,10 @@ services:
       MY_ID: out-3
       DB_MONGO_HOST: mongo
       ACTIVEMQ_BROKER_URL: tcp://activemq:61616
+    depends_on:
+      - activemq
+      - mongo
+      - mongo-express
     networks:
       - activemq
 
