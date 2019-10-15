@@ -1,4 +1,4 @@
-package biz.cits.db;
+package biz.cits.mq.db;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;

@@ -2,6 +2,12 @@ package biz.cits.mq;
 
 import javax.jms.ConnectionFactory;
 
+import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -17,6 +23,8 @@ import org.springframework.jms.support.converter.MappingJackson2MessageConverter
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 
+import java.util.Arrays;
+
 
 @SpringBootApplication
 @EnableJms
@@ -24,6 +32,21 @@ public class App {
 
     @Value("${spring.activemq.broker-url}")
     private String brokerUrl;
+
+    @Value("${db.mongo.host}")
+    private String DB_MONGO_HOST;
+
+    @Value("${db.mongo.port}")
+    private Integer DB_MONGO_PORT;
+
+    @Value("${db.mongo.name}")
+    private String DB_MONGO_NAME;
+
+    @Value("${db.mongo.user}")
+    private String DB_MONGO_USER;
+
+    @Value("${db.mongo.pswd}")
+    private String DB_MONGO_PSWD;
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
@@ -47,6 +70,24 @@ public class App {
         factory.setConnectionFactory(activeMQConnectionFactory());
 //        factory.setConcurrency("{#setDesiredConcurrency}");
         return factory;
+    }
+
+
+
+    public MongoClient mongoClient() {
+        MongoCredential mongoCredential = MongoCredential.createCredential(DB_MONGO_USER, "admin", DB_MONGO_PSWD.toCharArray());
+        MongoClient mongoClient = MongoClients.create(
+                MongoClientSettings.builder()
+                        .applyToClusterSettings(builder ->
+                                builder.hosts(Arrays.asList(new ServerAddress(DB_MONGO_HOST, DB_MONGO_PORT))))
+                        .credential(mongoCredential)
+                        .build());
+        return mongoClient;
+    }
+
+    @Bean
+    public MongoDatabase mongoDatabase() {
+        return mongoClient().getDatabase(DB_MONGO_NAME);
     }
 
     public static void main(String[] args) {
