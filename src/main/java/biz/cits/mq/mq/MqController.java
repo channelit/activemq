@@ -19,13 +19,17 @@ import java.util.Map;
 @RequestMapping("mq")
 public class MqController {
 
+    private final MqProducer mqProducer;
+
     @Autowired
-    MqProducer mqProducer;
+    public MqController(MqProducer mqProducer) {
+        this.mqProducer = mqProducer;
+    }
 
     @GetMapping(path = "send", produces = "application/json")
     public String sendMessages(@RequestParam int numMessage) {
         ArrayList<Map.Entry<String, String>> messages = MsgGenerator.getMessages(numMessage);
-        messages.forEach((e) -> mqProducer.sendMessage(e.getValue()));
+        messages.forEach((e) -> mqProducer.sendMessage(e.getKey(), e.getValue()));
         return "done";
     }
 }

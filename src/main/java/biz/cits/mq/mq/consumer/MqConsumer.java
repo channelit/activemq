@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
 import java.util.HashMap;
@@ -13,18 +14,15 @@ import java.util.HashMap;
 @Component
 public class MqConsumer {
 
-    @Value("${activemq.queue.name}")
-    String queueName;
-
     @Autowired
     private DataStore dataStore;
 
-
-    @JmsListener(destination = "FIFO_QUEUE")
+    @JmsListener(destination = "${activemq.queue.name}")
     public void receiveMessage(TextMessage message) throws JMSException {
         HashMap<String, String> records = new HashMap<>();
-        records.put("test", message.getText());
-        dataStore.storeData("test", records);
+        String groupId = message.getStringProperty("JMSXGroupID");
+        records.put(groupId, message.getText());
+        dataStore.storeData(groupId, records);
         System.out.println("Received <" + message + ">");
     }
 }

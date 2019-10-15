@@ -5,7 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Component;
+
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Queue;
+import javax.jms.Session;
 
 @Component
 public class MqProducer {
@@ -22,8 +29,14 @@ public class MqProducer {
         this.jmsTemplate = jmsTemplate;
     }
 
-    public void sendMessage(String message) {
-        LOGGER.info("Sending message " + message);
-        jmsTemplate.convertAndSend(queueName, message);
+    public void sendMessage(String key, String messageStr) {
+        LOGGER.info("Sending message " + messageStr);
+        jmsTemplate.send(queueName, new MessageCreator() {
+            public Message createMessage(Session session) throws JMSException {
+                Message message = session.createTextMessage(messageStr);
+                message.setStringProperty("JMSXGroupID", key);
+                return message;
+            }
+        });
     }
 }
