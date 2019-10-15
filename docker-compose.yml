@@ -1,0 +1,96 @@
+version: '3.7'
+services:
+
+  activemq:
+    image: cithub/activemq
+    hostname: activemq
+    container_name: activemq
+    restart: always
+    ports:
+      - "61616:61616"
+      - "5672:5672"
+      - "61613:61613"
+      - "1883:1883"
+      - "61614:61614"
+      - "8161:8161"
+    networks:
+      - activemq
+
+  mongo:
+    image: mongo
+    restart: always
+    container_name: mongo
+    command: --serviceExecutor adaptive
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    networks:
+      - activemq
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    container_name: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+    networks:
+      - activemq
+
+#  service1:
+#    image: kafka-mq:v1
+#    restart: always
+#    container_name: service1
+#    ports:
+#      - 7081:8080
+#    environment:
+#      MY_ID: out-1
+#      KAFKA_SERVER_URL: kafka1:7091,kafka2:7092,kafka3:7093
+#      MQ_HOST: ibmmq
+#      DB_MONGO_HOST: mongo
+#      KAFKA_CONSUMER_START: "false"
+#      KAFKA_STREAM_START: "true"
+#      KAFKA_CLIENT_ID: service
+#    networks:
+#      - activemq
+#
+#  service2:
+#    image: kafka-mq:v1
+#    restart: always
+#    container_name: service2
+#    ports:
+#      - 7082:8080
+#    environment:
+#      MY_ID: out-2
+#      KAFKA_SERVER_URL: kafka1:7091,kafka2:7092,kafka3:7093
+#      MQ_HOST: ibmmq
+#      DB_MONGO_HOST: mongo
+#      KAFKA_CONSUMER_START: "false"
+#      KAFKA_STREAM_START: "true"
+#      KAFKA_CLIENT_ID: service
+#    networks:
+#      - activemq
+#
+#  service3:
+#    image: kafka-mq:v1
+#    restart: always
+#    container_name: service3
+#    ports:
+#      - 7083:8080
+#    environment:
+#      MY_ID: out-3
+#      KAFKA_SERVER_URL: kafka1:7091,kafka2:7092,kafka3:7093
+#      MQ_HOST: ibmmq
+#      DB_MONGO_HOST: mongo
+#      KAFKA_CONSUMER_START: "false"
+#      KAFKA_STREAM_START: "true"
+#      KAFKA_CLIENT_ID: service
+#    networks:
+#      - activemq
+
+networks:
+  activemq:
