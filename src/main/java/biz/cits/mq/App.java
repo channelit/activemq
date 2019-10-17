@@ -11,6 +11,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -78,7 +79,7 @@ public class App {
     }
 
 
-
+    @Bean
     public MongoClient mongoClient() {
         MongoCredential mongoCredential = MongoCredential.createCredential(DB_MONGO_USER, "admin", DB_MONGO_PSWD.toCharArray());
         MongoClient mongoClient = MongoClients.create(
@@ -91,8 +92,8 @@ public class App {
     }
 
     @Bean
-    public MongoDatabase mongoDatabase() {
-        return mongoClient().getDatabase(DB_MONGO_NAME);
+    public MongoDatabase mongoDatabase(@Qualifier("mongoClient") MongoClient mongoClient) {
+        return mongoClient.getDatabase(DB_MONGO_NAME);
     }
 
     public static void main(String[] args) {
