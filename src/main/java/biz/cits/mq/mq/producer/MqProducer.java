@@ -31,12 +31,10 @@ public class MqProducer {
 
     public void sendMessage(String key, String messageStr) {
         LOGGER.info("Sending message " + messageStr);
-        jmsTemplate.send(queueName, new MessageCreator() {
-            public Message createMessage(Session session) throws JMSException {
-                Message message = session.createTextMessage(messageStr);
-                message.setStringProperty("JMSXGroupID", key);
-                return message;
-            }
+        jmsTemplate.send(queueName, session -> {
+            Message message = session.createTextMessage(messageStr);
+            message.setStringProperty("JMSXGroupID", key);
+            return message;
         });
     }
 }
